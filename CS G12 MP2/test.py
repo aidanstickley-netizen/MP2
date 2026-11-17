@@ -3,16 +3,26 @@ import random
 import math
 
 
-class player:
-    def __init__(self, name: str):
+class player(pygame.sprite.Sprite):
+    def __init__(self, image, name: str, spawning_location):
+        super().__init__()
+        self.image = image
         self.name: str = name
         self.hp: int = 8
         self.max_hp: int = 8
         self.rings: int = 0
         self.money: int = 0
+        self.rect = self.image.get_rect(center=spawning_location)
         self.inv: list[str]=[]
         self.status_effects: list[dict] = []
         self.equipped_weapon: str | None = "bare fists"
+    def update(self):
+            self.rect.move_ip(self.velocity)
+    
+    def fire(self, cursor_location):
+        direction = (pygame.math.Vector2(cursor_location[0], cursor_location[1]) - pygame.math.Vector2(self.rect.center[0], self.rect.center[1])).normalize()*10
+        print(direction)
+        Bullet_list.add(Bullets(self.rect.center, direction))
 class WeponsOptriom:
     def __init__(self, name: str, damage: int, cost: int, currency_type: str, cooldown: int, hit_effect: int, crit_chance: float, aoe: bool):
         self.name= name
@@ -66,14 +76,14 @@ weapons_database = {
 
 pygame.init()
 screen1 = pygame.display.set_mode((800,400))
-
+gravity = 0.2
 p1_velocity = pygame.math.Vector2(0,0)
 p2_velocity = pygame.math.Vector2(0,0)
 playerimage = pygame.image.load("dde.png").convert_alpha()
 playerimage = pygame.transform.scale(playerimage, (60,40))
-
 enermyimage = pygame.image.load("eed.png").convert()
 enermyimage = pygame.transform.scale(enermyimage, (60,40))
+floor_y = 500
 
 class Bullets(pygame.sprite.Sprite):
     def __init__(self, spawning_location, Direction):
@@ -88,22 +98,6 @@ class Bullets(pygame.sprite.Sprite):
         if(self.rect.top<0 or self.rect.left<0 or self.rect.right>800 or self.rect.bottom >400):
              self.kill()
 
-class Soldier(pygame.sprite.Sprite):
-    def __init__(self, image, spawning_location):
-        super().__init__()
-        self.image = image
-        self.hp = 100
-        self.damage = 20
-        self.rect = self.image.get_rect(center=spawning_location)
-        self.velocity = pygame.math.Vector2(0,0)
-
-    def update(self):
-        self.rect.move_ip(self.velocity)
-
-    def fire(self, cursor_location):
-        direction = (pygame.math.Vector2(cursor_location[0], cursor_location[1]) - pygame.math.Vector2(self.rect.center[0], self.rect.center[1])).normalize()*10
-        print(direction)
-        Bullet_list.add(Bullets(self.rect.center, direction))
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, color, width, height):
@@ -113,8 +107,8 @@ class Block(pygame.sprite.Sprite):
        self.rect = self.image.get_rect(center =(200, 300))
 
 block1 = Block((255, 100, 98),10,10)
-player1 = Soldier(playerimage, (100, 200))
-player2 = Soldier(enermyimage, (300, 200))
+player1 = player(playerimage,"hfud" ,(100, 200))
+player2 = player(enermyimage,"wer" ,(300, 200))
 
 sprites_list1 = pygame.sprite.Group()
 sprites_list1.add(player1)
@@ -129,64 +123,63 @@ clock = pygame.time.Clock()
 while gameactive:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-                gameactive = False
+            gameactive = False
         if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w:
-                    p1_velocity += pygame.math.Vector2(0,-2)
-                if event.key == pygame.K_a:
-                    p1_velocity += pygame.math.Vector2(-2,0)
-                if event.key == pygame.K_s:
-                    p1_velocity += pygame.math.Vector2(0,2)
-                if event.key == pygame.K_d:
-                    p1_velocity += pygame.math.Vector2(2,0)
-                if event.key == pygame.K_UP:
-                    p2_velocity += pygame.math.Vector2(0,-2)
-                if event.key == pygame.K_LEFT:
-                    p2_velocity += pygame.math.Vector2(-2,0)
-                if event.key == pygame.K_DOWN:
-                    p2_velocity += pygame.math.Vector2(0,2)
-                if event.key == pygame.K_RIGHT:
-                    p2_velocity += pygame.math.Vector2(2,0)
+            if event.key == pygame.K_w:
+                p1_velocity += pygame.math.Vector2(0,-2)
+            if event.key == pygame.K_a:
+                p1_velocity += pygame.math.Vector2(-2,0)
+            if event.key == pygame.K_s:
+                p1_velocity += pygame.math.Vector2(0,2)
+            if event.key == pygame.K_d:
+                p1_velocity += pygame.math.Vector2(2,0)
+            if event.key == pygame.K_UP:
+                p2_velocity += pygame.math.Vector2(0,-2)
+            if event.key == pygame.K_LEFT:
+                p2_velocity += pygame.math.Vector2(-2,0)
+            if event.key == pygame.K_DOWN:
+                p2_velocity += pygame.math.Vector2(0,2)
+            if event.key == pygame.K_RIGHT:
+                p2_velocity += pygame.math.Vector2(2,0)
         if event.type == pygame.KEYUP:
-                if event.key == pygame.K_w:
-                    p1_velocity += pygame.math.Vector2(0,2)
-                if event.key == pygame.K_a:
-                    p1_velocity += pygame.math.Vector2(2,0)
-                if event.key == pygame.K_s:
-                    p1_velocity += pygame.math.Vector2(0,-2)
-                if event.key == pygame.K_d:
-                    p1_velocity += pygame.math.Vector2(-2,0)
-                if event.key == pygame.K_UP:
-                    p2_velocity += pygame.math.Vector2(0,2)
-                if event.key == pygame.K_LEFT:
-                    p2_velocity += pygame.math.Vector2(2,0)
-                if event.key == pygame.K_DOWN:
-                    p2_velocity += pygame.math.Vector2(0,-2)
-                if event.key == pygame.K_RIGHT:
-                    p2_velocity += pygame.math.Vector2(-2,0)
-
+            if event.key == pygame.K_w:
+                p1_velocity += pygame.math.Vector2(0,2)
+            if event.key == pygame.K_a:
+                p1_velocity += pygame.math.Vector2(2,0)
+            if event.key == pygame.K_s:
+                p1_velocity += pygame.math.Vector2(0,-2)
+            if event.key == pygame.K_d:
+                p1_velocity += pygame.math.Vector2(-2,0)
+            if event.key == pygame.K_UP:
+                p2_velocity += pygame.math.Vector2(0,2)
+            if event.key == pygame.K_LEFT:
+                p2_velocity += pygame.math.Vector2(2,0)
+            if event.key == pygame.K_DOWN:
+                p2_velocity += pygame.math.Vector2(0,-2)
+            if event.key == pygame.K_RIGHT:
+                p2_velocity += pygame.math.Vector2(-2,0)
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                   sprites_list1.sprites()[0].fire(event.pos)
             if event.button == 3:
                   player2.fire(event.pos)
-
-    screen1.fill((0,0,0))
-    # Update velocities and sprites
+        p1_velocity+= pygame.math.Vector2(0,gravity)
+        p2_velocity+= pygame.math.Vector2(0,gravity)
     player1.velocity = p1_velocity
     player2.velocity = p2_velocity
-   
+    pygame.draw.line(screen1, (200, 200, 200), (0, floor_y), (800, floor_y), 3)
+    screen1.fill((0,0,0))
     player1.update()
     player2.update()
     Bullet_list.update()
    
-    # Draw systems
     sprites_list1.draw(screen1)
     Bullet_list.draw(screen1)
 
-    # Detect collision
-    if player1.rect.colliderect(block1.rect):
-         sprites_list1.remove(block1)
 
+
+    if player1.rect.colliderect(block1.rect):
+        sprites_list1.remove(block1)
+    
     pygame.display.update()
     clock.tick(60)
