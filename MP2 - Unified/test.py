@@ -33,7 +33,6 @@ class WeponsOptriom:
         self.hit_effect= hit_effect
         self.crit_chance= crit_chance
         self.aoe= aoe
-
 effects = {
     1: {"name": "no effect", "damage_per_tick": 0, "duration": 0},
     2: {"name": "bleed", "damage_per_tick": 1, "duration": 2},
@@ -65,7 +64,7 @@ weapons_database = {
     "bare fists": WeponsOptriom("bare fists", 50, 0, "rings",1, 1, 0.05, False),
     "plunger": WeponsOptriom("plunger", 199, 150, "rings",15, 3, 0.05, False),
     "Broom": WeponsOptriom("Broom", 150, 200, "rings",12, 1, 0.05, False),
-    "bic lighter": WeponsOptriom("bic lighter", 100, 300, "money",7, 4, 0.10, False),
+    "bic lighter": WeponsOptriom("bic lighter", 100, 300, "money",7, 4, 0.10, False), 
     "Axe": WeponsOptriom("Axe", 200, 300, "rings",14, 2, 0.15, False),
     "curtainrod": WeponsOptriom("curtainrod", 200, 300, "rings",14, 1, 0.05, False),
     "watermelon": WeponsOptriom("watermelon", 400, 300, "rings",17, 1, 0.02, True),
@@ -73,17 +72,30 @@ weapons_database = {
     "towel": WeponsOptriom("towel", 200, 500, "rings",7, 1, 0.05, False),
     "Floor tile": WeponsOptriom("Floor tile", 550, 689, "rings",4, 2, 0.05, True),
 }
-
 pygame.init()
+sprite_sheet_image1 = pygame.image.load('dde.png').convert_alpha()
+sprite_sheet_image2 = pygame.image.load('eed.png').convert_alpha()
+class SpriteSheet():
+      def __init__(self, image):
+            self.sheet = image
+
+      def get_image(self, frame, width, height, scale):
+            individual_img = pygame.Surface((width, height)).convert_alpha()
+            individual_img.blit(self.sheet, (0, 0), ((frame * width), 0, width, height))
+            individual_img = pygame.transform.scale(individual_img, (width * scale, height * scale))
+            return individual_img
+
 screen1 = pygame.display.set_mode((800,400))
-gravity = 0.2
+gravity = 0.8
+on_ground_p1 = False
+on_ground_p2 = False
 p1_velocity = pygame.math.Vector2(0,0)
 p2_velocity = pygame.math.Vector2(0,0)
-playerimage = pygame.image.load("dde.png").convert_alpha()
+playerimage = 
 playerimage = pygame.transform.scale(playerimage, (60,40))
-enermyimage = pygame.image.load("eed.png").convert()
+enermyimage = 
 enermyimage = pygame.transform.scale(enermyimage, (60,40))
-floor_y = 500
+floor_y = 350
 
 class Bullets(pygame.sprite.Sprite):
     def __init__(self, spawning_location, Direction):
@@ -99,20 +111,11 @@ class Bullets(pygame.sprite.Sprite):
              self.kill()
 
 
-class Block(pygame.sprite.Sprite):
-    def __init__(self, color, width, height):
-       super().__init__()
-       self.image = pygame.Surface([width, height])
-       self.image.fill(color)
-       self.rect = self.image.get_rect(center =(200, 300))
-
-block1 = Block((255, 100, 98),10,10)
 player1 = player(playerimage,"hfud" ,(100, 200))
 player2 = player(enermyimage,"wer" ,(300, 200))
 
 sprites_list1 = pygame.sprite.Group()
 sprites_list1.add(player1)
-sprites_list1.add(block1)
 sprites_list1.add(player2)
 
 Bullet_list = pygame.sprite.Group()
@@ -125,37 +128,28 @@ while gameactive:
         if event.type == pygame.QUIT:
             gameactive = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_w:
-                p1_velocity += pygame.math.Vector2(0,-2)
+            if event.key == pygame.K_w and on_ground_p1:
+                p1_velocity += pygame.math.Vector2(0,-15)
+                on_ground_p1 = False
+                
             if event.key == pygame.K_a:
                 p1_velocity += pygame.math.Vector2(-2,0)
-            if event.key == pygame.K_s:
-                p1_velocity += pygame.math.Vector2(0,2)
             if event.key == pygame.K_d:
                 p1_velocity += pygame.math.Vector2(2,0)
-            if event.key == pygame.K_UP:
-                p2_velocity += pygame.math.Vector2(0,-2)
+            if event.key == pygame.K_UP and on_ground_p2:
+                p2_velocity += pygame.math.Vector2(0,-15)
+                on_ground_p2 = False
             if event.key == pygame.K_LEFT:
                 p2_velocity += pygame.math.Vector2(-2,0)
-            if event.key == pygame.K_DOWN:
-                p2_velocity += pygame.math.Vector2(0,2)
             if event.key == pygame.K_RIGHT:
                 p2_velocity += pygame.math.Vector2(2,0)
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_w:
-                p1_velocity += pygame.math.Vector2(0,2)
             if event.key == pygame.K_a:
                 p1_velocity += pygame.math.Vector2(2,0)
-            if event.key == pygame.K_s:
-                p1_velocity += pygame.math.Vector2(0,-2)
             if event.key == pygame.K_d:
                 p1_velocity += pygame.math.Vector2(-2,0)
-            if event.key == pygame.K_UP:
-                p2_velocity += pygame.math.Vector2(0,2)
             if event.key == pygame.K_LEFT:
                 p2_velocity += pygame.math.Vector2(2,0)
-            if event.key == pygame.K_DOWN:
-                p2_velocity += pygame.math.Vector2(0,-2)
             if event.key == pygame.K_RIGHT:
                 p2_velocity += pygame.math.Vector2(-2,0)
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -163,23 +157,25 @@ while gameactive:
                   sprites_list1.sprites()[0].fire(event.pos)
             if event.button == 3:
                   player2.fire(event.pos)
-        p1_velocity+= pygame.math.Vector2(0,gravity)
-        p2_velocity+= pygame.math.Vector2(0,gravity)
+    p1_velocity+= pygame.math.Vector2(0,gravity)
+    p2_velocity+= pygame.math.Vector2(0,gravity)
     player1.velocity = p1_velocity
     player2.velocity = p2_velocity
-    pygame.draw.line(screen1, (200, 200, 200), (0, floor_y), (800, floor_y), 3)
     screen1.fill((0,0,0))
+    pygame.draw.line(screen1, (200, 200, 200), (0, floor_y), (800, floor_y), 3)
     player1.update()
     player2.update()
     Bullet_list.update()
-   
+    if player1.rect.bottom >= floor_y:
+        player1.rect.bottom = floor_y
+        p1_velocity.y = 0
+        on_ground_p1 = True
+    if player2.rect.bottom >= floor_y:
+        player2.rect.bottom = floor_y
+        p2_velocity.y = 0
+        on_ground_p2 = True
     sprites_list1.draw(screen1)
     Bullet_list.draw(screen1)
-
-
-
-    if player1.rect.colliderect(block1.rect):
-        sprites_list1.remove(block1)
     
     pygame.display.update()
     clock.tick(60)
