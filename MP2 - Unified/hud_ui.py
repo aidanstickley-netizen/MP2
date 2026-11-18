@@ -24,12 +24,13 @@ ui_3 = pygame.transform.scale(ui_3, (44 * 3, 30 * 3))
 numbers_black = pygame.image.load("graphics/hud/zero_to_nine_num_black.png")
 numbers_white = pygame.image.load("graphics/hud/zero_to_nine_num_white.png")
 
+character = pygame.image.load("graphics/characters/scr_guy.png")
+
 equipment = pygame.image.load("graphics/equipment/weapons_icon.png")
 
-def gather_frames(to_be_cut, x_size, y_size, mult, frame_count):
-	Animation_object = spriteSheet(to_be_cut)
-	return [Animation_object.get_frame(i, x_size, y_size, mult) for i in range(frame_count)]
-
+def gather_frames(to_be_cut, x_size, y_size, mult, frame_count, row_count = 0, mirroring = False):
+	Animation_object = spriteSheet(mirror_image(to_be_cut, mirroring))
+	return [Animation_object.get_frame(i, x_size, y_size, mult, row= row_count) for i in range(frame_count)]
 
 def wobble(original_value, active = True):
 	if active:
@@ -45,9 +46,9 @@ def mirror_image(object, check):
 class spriteSheet():
 	def __init__(self, image):
 		self.sheet = image
-	def get_frame(self, frame, width, height, scale):
+	def get_frame(self, frame, width, height, scale, row = 0):
 		individual_img = pygame.Surface((width, height), pygame.SRCALPHA)
-		individual_img.blit(self.sheet, (0, 0), ((frame * width), 0, width, height))
+		individual_img.blit(self.sheet, (0, 0), ((frame * width), (row * height), width, height))
 		individual_img = pygame.transform.scale(individual_img, (width * scale, height * scale))
 		return individual_img
 
@@ -62,9 +63,23 @@ number = [gather_frames(numbers_black, 3, 7, 3, 10),
 	
 held_equipment = gather_frames(equipment, 13, 13, 3, 75)
 
+player = {
+	"walk_right": gather_frames(character, 13, 21, 3, 5),
+	"idle_right": gather_frames(character, 13, 21, 3, 5, 1),
+	"walk_right_up": gather_frames(character, 13, 21, 3, 5, 2),
+	"attack_right": gather_frames(character, 13, 21, 3, 5, 3),
+	"jump_right": gather_frames(character, 13, 21, 3, 5, 4),
+	"damage": gather_frames(character, 13, 21, 3, 5, 5),
+	"walk_left": gather_frames(character, 13, 21, 3, 5, mirroring= True),
+	"idle_left": gather_frames(character, 13, 21, 3, 5, 1, mirroring= True),
+	"walk_left_up": gather_frames(character, 13, 21, 3, 5, 2, mirroring= True),
+	"attack_left": gather_frames(character, 13, 21, 3, 5, 3, mirroring= True),
+	"jump_left": gather_frames(character, 13, 21, 3, 5, 4, mirroring= True)
+	}
+
 frame_var = 0 #placeholder
 heart_level = 0 #placeholder
-Game_active = True
+Game_active = False # set to true to ativate this code
 
 animation_tick = 0
 ticking_tool = 0
@@ -74,20 +89,25 @@ def display_num(value, xpos = 0, ypos = 0, colour_number = 0):
 	for x in range(len(value2)):
 		Screen1.blit(number[colour_number][int(value2[x])], (xpos + 12 * x, ypos))
 
+def display_wallet(xcord, ycord, scr_count = 0, money_count = 0, money_display_move = 0):
+	
+	Screen1.blit(ui_2, (money_display_move, ycord))
+	display_num(scr_count, xcord, ycord)
+	display_num(money_count, xcord, ycord + 27)
+
 def make_hud(x_cord, y_cord, mirror, bar, heart, scr_value = 100, money_value = 30):
 	bar_add_x = x_cord + 12
 	number_x_offset = x_cord + 42
 	mirror_buff = [0, 30, 60]
 	held_equipment_mirror = [6, 66, 126]
+	money_display = bar_add_x
 
 	if mirror:
 		bar_add_x += 27
 		mirror_buff = [120, 90, 60]
 		held_equipment_mirror = [153, 93, 33]
 		number_x_offset += 81
-		Screen1.blit(ui_2, (bar_add_x + 120, y_cord + 114))
-	else:
-		Screen1.blit(ui_2, (bar_add_x, y_cord + 114))
+		money_display += 147
 
 	hearts = [0, 0, 0]
 	if heart > 4:
@@ -104,9 +124,7 @@ def make_hud(x_cord, y_cord, mirror, bar, heart, scr_value = 100, money_value = 
 	Screen1.blit(mirror_image(ui_1, mirror), (x_cord, y_cord))
 	Screen1.blit(mirror_image(Frames_bar[bar], mirror), (bar_add_x, y_cord + 54))
 
-
-	display_num(scr_value, number_x_offset, y_cord + 114)
-	display_num(money_value, number_x_offset, y_cord + 141)
+	display_wallet(number_x_offset, y_cord + 114, scr_value, money_value, money_display_move = money_display)
 
 	for x in range(3):
 		Screen1.blit(mirror_image(Frames_heart[hearts[x]], mirror), (bar_add_x + mirror_buff[x], y_cord + 78))
@@ -124,17 +142,17 @@ while Game_active:
 		if event.type == pygame.QUIT:
 			Game_active = False
 		if event.type == pygame.KEYDOWN:
-					if event.key == pygame.K_w:
-						if frame_var < 7:
-							frame_var +=1
-						else:
-							frame_var = 0
-					elif event.key == pygame.K_s:
-						if heart_level < 12:
-							heart_level +=1
-						else:
-							heart_level = 0
-						print(heart_level)
+			if event.key == pygame.K_w:
+				if frame_var < 7:
+					frame_var +=1
+				else:
+					frame_var = 0
+			elif event.key == pygame.K_s:
+				if heart_level < 12:
+					heart_level +=1
+				else:
+					heart_level = 0
+				print(heart_level)
 
 	Screen1.fill(color)
 
