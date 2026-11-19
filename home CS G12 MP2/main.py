@@ -10,14 +10,22 @@ class SpriteSheet():
         individual_img.blit(self.sheet, (0, 0), ((frame * width), 0, width, height))
         individual_img = pygame.transform.scale(individual_img, (width * s, height * s))
         return individual_img
+def gather_frames(to_be_cut, x_size, y_size, mult, frame_count, row_count = 0, mirroring = False):
+	Animation_object = SpriteSheet(mirror_image(to_be_cut, mirroring))
+	return [Animation_object.get_frame(i, x_size, y_size, mult, row= row_count) for i in range(frame_count)]
+def mirror_image(object, check):
+	if check:
+		object = pygame.transform.flip(object, -1, 0)
+	return object
 class player(pygame.sprite.Sprite):
-    def __init__(self, frames: list[pygame.Surface], name: str, spawning_location):
+    def __init__(self, frames: dict[str, pygame.Surface], name: str, spawning_location):
         super().__init__()
         self.frames = frames
         self.velocity = pygame.math.Vector2(0, 0)
-        self.frame_index = 0
+        self.state = "idle"
+        self.mirror=False
         self.animation=0.15
-        self.image = self.frames[self.frame_index]
+        self.image = self.frames[self.state]
         self.name: str = name
         self.hp: int = 8
         self.max_hp: int = 8
@@ -39,12 +47,19 @@ class player(pygame.sprite.Sprite):
                 self.on_ground = False
             self.animate()
     def animate(self):
+        if self.velocity.x < 0:
+            self.mirror = True
+        elif self.velocity.x > 0:
+            self.mirror = False
         if not self.on_ground:
-            self.frame_index = 1
-            self.image = self.frames[1]
+            self.state = "jump"
         else:
-            self.frame_index = 0
-            self.image = self.frames[0]
+            self.state = "idle"
+        base_image = self.frames[self.state]
+        if self.mirror:
+            self.image = pygame.transform.flip(base_image, True, False)
+        else:
+            self.image = base_image
     def fire(self, cursor_location):
         direction = (pygame.math.Vector2(cursor_location[0], cursor_location[1]) - pygame.math.Vector2(self.rect.center[0], self.rect.center[1])).normalize()*10
         print(direction)
@@ -107,12 +122,19 @@ playerimage = pygame.image.load("dde.png").convert_alpha()
 enermyimage = pygame.image.load("eed.png").convert_alpha()
 p1_sheet_cut = SpriteSheet(playerimage)
 p2_sheet_cut = SpriteSheet(enermyimage)
-fw=150
+fw=160
 fh=300
 s=0.3
 nf=2
-p1_sheet=[p1_sheet_cut.get_image(i, fw, fh-25, s) for i in range(nf)]
-p2_sheet = [p2_sheet_cut.get_image(i, fw, fh, s) for i in range(nf)]
+SpriteSheet
+p1_sheet = {
+    "idle": p1_sheet_cut.get_image(0, fw, fh - 25, s),
+    "jump": p1_sheet_cut.get_image(1, fw, fh - 25, s),
+}
+p2_sheet = {
+    "idle": p2_sheet_cut.get_image(0, fw, fh, s),
+    "jump": p2_sheet_cut.get_image(1, fw, fh, s),
+}
 floor_y = 350
 class Bullets(pygame.sprite.Sprite):
     def __init__(self, spawning_location, Direction):
