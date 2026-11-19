@@ -2,6 +2,7 @@ import pygame
 import random
 # frame rate is 60/s
 # animation frame rate is 12/s
+# clean up the code for making character spritesheets
 
 pygame.init()
 Screen1 = pygame.display.set_mode((800,400))    
@@ -24,7 +25,7 @@ ui_3 = pygame.transform.scale(ui_3, (44 * 3, 30 * 3))
 numbers_black = pygame.image.load("graphics/hud/zero_to_nine_num_black.png")
 numbers_white = pygame.image.load("graphics/hud/zero_to_nine_num_white.png")
 
-character = pygame.image.load("graphics/characters/scr_guy.png")
+character = pygame.image.load("graphics/characters/scr_guy_blue.png")
 
 equipment = pygame.image.load("graphics/equipment/weapons_icon.png")
 
@@ -53,9 +54,7 @@ class spriteSheet():
 		return individual_img
 
 Frames = gather_frames(scr, 9, 9, 3, 8)
-
 Frames_bar = gather_frames(bar, 49, 7, 3, 8)
-
 Frames_heart = gather_frames(hearts, 9, 9, 3, 5)
 
 number = [gather_frames(numbers_black, 3, 7, 3, 10), 
@@ -83,6 +82,11 @@ Game_active = False # set to true to ativate this code
 
 animation_tick = 0
 ticking_tool = 0
+
+def flet_button(xcord, ycord, xsize, ysize):
+	button_blit_tool = pygame.image.load("graphics/characters/scr_guy_purple.png")
+	button_blit_tool = pygame.transform.scale(button_blit_tool, (xsize, ysize))
+	Screen1.blit(button_blit_tool, (xcord, ycord))
 
 def display_num(value, xpos = 0, ypos = 0, colour_number = 0):
 	value2 = str(value)
@@ -136,6 +140,9 @@ def make_hud(x_cord, y_cord, mirror, bar, heart, scr_value = 100, money_value = 
 def make_event_display(time, xpos = 333, ypos = 9):
 	Screen1.blit(ui_3, (xpos, ypos))
 	display_num(time, xpos + 45 + 12 - 2, ypos + 66)
+
+def printer():
+	print("hello")
 	
 while Game_active:
 	for event in pygame.event.get():

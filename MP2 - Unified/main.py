@@ -3,6 +3,9 @@ import random
 import hud_ui as ui
 # frame rate is 60/s
 # animation frame rate is 12/s
+particle = 0
+
+active_buttons = [[100, 200, 100, 200]]
 
 pygame.init()
 Screen1 = pygame.display.set_mode((800,400))
@@ -14,22 +17,27 @@ color3 = (200, 200, 255)
 frame_var = 0 #placeholder
 heart_level = 0 #placeholder
 Game_active = True
-
 animation_tick = 0
 ticking_tool = 0
-
+global page
 page = "title"
+
 	
 while Game_active:
 	if page == "title":
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				Game_active = False
-			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_c:
-					page = "battle1v1"
+		if event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_c:
+				page = "battle1vbot"
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			if event.button == 1 & (100 < event.pos[0] < 200) & (200 < event.pos[1] < 400):
+				page = "battle1vbot"
 
-			Screen1.fill(color)
+		Screen1.fill(color)
+
+		ui.flet_button(100, 200, 100, 200)
 
 	elif page == "battle1v1":
 		for event in pygame.event.get():
