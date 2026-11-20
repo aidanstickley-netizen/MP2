@@ -69,13 +69,20 @@ while Game_active:
 					mov.player2.velocity.x -= 2
 				if event.key == pygame.K_c:
 					page = "battle1vbot"
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				if event.button == 1 and mov.player1.alive():
+					mov.player1.fire(event.pos)
+				if event.button == 3 and mov.player2.alive():
+					mov.player2.fire(event.pos)
 
 
 		Screen1.fill((100,0,0))
 		pygame.draw.line(Screen1, (200, 200, 200), (0, mov.floor_y), (800, mov.floor_y), 3)
 		mov.player1.update(mov.gravity, mov.floor_y)
 		mov.player2.update(mov.gravity, mov.floor_y)
+		mov.update_bullets()
 		mov.sprites_list1.draw(Screen1)
+		mov.Bullet_list.draw(Screen1)
 
 		ui.make_event_display(42)
 

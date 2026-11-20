@@ -16,11 +16,12 @@ class player(pygame.sprite.Sprite):
     def __init__(self, frames: dict[str, pygame.Surface], name: str, spawning_location):
         super().__init__()
         self.frames = frames
+        self.frame_index: float = 0.0
         self.velocity = pygame.math.Vector2(0, 0)
         self.state = "idle"
         self.mirror= False
         self.animation=0.15
-        self.image = self.frames[self.state]
+        self.image = self.frames[self.state][0]
         self.name: str = name
         self.hp: int = 8
         self.max_hp: int = 8
@@ -43,7 +44,14 @@ class player(pygame.sprite.Sprite):
             else:
                 self.on_ground = False
             self.animate()
-
+    def take_damage(self, amount: int):
+        self.hp -= amount
+        while self.hp <= 0 and self.hearts > 0:
+            self.hearts -= 1
+            if self.hearts > 0:
+                self.hp += self.max_hp
+            else:
+                self.hp = 0
     def animate(self):
         if self.velocity.x < 0:
             self.mirror = True
@@ -51,17 +59,30 @@ class player(pygame.sprite.Sprite):
             self.mirror = False
         if not self.on_ground:
             self.state = "jump"
+        elif self.velocity.x != 0:
+            self.state = "walk"
         else:
             self.state = "idle"
-        base_image = self.frames[self.state]
+        current_frames = self.frames[self.state]
+        self.frame_index = (self.frame_index + self.animation) % len(current_frames)
+        base_image = current_frames[int(self.frame_index)]
+        if self.mirror:
+            self.image = pygame.transform.flip(base_image, True, False)
+        else:
+            self.image = base_image
+        if self.frame_index >= len(current_frames):
+            self.frame_index = 0.0
+
+        base_image = current_frames[int(self.frame_index)]
         if self.mirror:
             self.image = pygame.transform.flip(base_image, True, False)
         else:
             self.image = base_image
     def fire(self, cursor_location):
-        direction = (pygame.math.Vector2(cursor_location[0], cursor_location[1]) - pygame.math.Vector2(self.rect.center[0], self.rect.center[1])).normalize()*10
-        print(direction)
-        Bullet_list.add(Bullets(self.rect.center, direction))
+        aim_vector = pygame.math.Vector2(cursor_location) - pygame.math.Vector2(self.rect.center)
+        if aim_vector.length() > 0:
+            direction = aim_vector.normalize() * 10
+            Bullet_list.add(Bullets(self.rect.center, direction, owner=self))
 class WeponsOptriom:
     def __init__(self, name: str, damage: int, cost: int, currency_type: str, cooldown: int, hit_effect: int, crit_chance: float, aoe: bool):
         self.name= name
@@ -124,23 +145,33 @@ s=0.3
 nf=2
 p1_sheet = ui.get_player_texture(player1_image)
 p2_sheet = ui.get_player_texture(player2_image)
-
 floor_y = 350
 
 class Bullets(pygame.sprite.Sprite):
-    def __init__(self, spawning_location, Direction):
+    def __init__(self, spawning_location, direction, owner, damage=7):
         super().__init__()
         self.image = pygame.Surface([10, 10])
-        self.image.fill((227,174,27))
-        self.rect = self.image.get_rect(center = spawning_location)
-        self.direction = Direction
+        self.image.fill((227, 174, 27))
+        self.rect = self.image.get_rect(center=spawning_location)
+        self.direction = direction
+        self.owner = owner
+        self.damage = damage
     def update(self):
-        print(tuple([x for x in self.direction]))
-        self.rect.move_ip(tuple([x for x in self.direction]))
-        if(self.rect.top<0 or self.rect.left<0 or self.rect.right>800 or self.rect.bottom >400):
-             self.kill()
-
-player1 = player(p1_sheet,"hfud" ,(100, 200))#ui.get_player_texture(ui.character)
+        self.rect.move_ip(self.direction)
+        if self.rect.top < 0 or self.rect.left < 0 or self.rect.right > 800 or self.rect.bottom > 400:
+            self.kill()
+def update_bullets():
+    Bullet_list.update()
+    for bullet in Bullet_list:
+        hit_players = pygame.sprite.spritecollide(bullet, sprites_list1, False)
+        for target in hit_players:
+            if target != bullet.owner:
+                target.take_damage(bullet.damage)
+                bullet.kill()
+                if target.hearts <= 0:
+                    target.kill()
+                break
+player1 = player(p1_sheet,"hfud" ,(100, 200))
 player2 = player(p2_sheet,"wer" ,  (300, 200))
 
 sprites_list1 = pygame.sprite.Group()
@@ -149,7 +180,7 @@ sprites_list1.add(player2)
 
 Bullet_list = pygame.sprite.Group()
 
-gameactive = True
+gameactive = False
 clock = pygame.time.Clock()
 
 while gameactive:
@@ -182,14 +213,23 @@ while gameactive:
                 player2.velocity.x -= 2
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
-                  sprites_list1.sprites()[0].fire(event.pos)
+                player1.fire(event.pos)
             if event.button == 3:
-                  player2.fire(event.pos)
+                player2.fire(event.pos)
     screen1.fill((0,0,0))
     pygame.draw.line(screen1, (200, 200, 200), (0, floor_y), (800, floor_y), 3)
     player1.update(gravity, floor_y)
     player2.update(gravity, floor_y)
     Bullet_list.update()
+    for bullet in Bullet_list:
+        hit_players = pygame.sprite.spritecollide(bullet, sprites_list1, False)
+        for target in hit_players:
+            if target != bullet.owner:
+                target.hp -= bullet.damage
+                bullet.kill()
+                if target.hp <= 0:
+                    target.kill()
+                break
     sprites_list1.draw(screen1)
     Bullet_list.draw(screen1)
     

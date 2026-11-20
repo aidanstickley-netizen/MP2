@@ -67,7 +67,6 @@ held_equipment = gather_frames(equipment, 13, 13, 3, 75)
 player = {
 	"walk": gather_frames(character, 13, 21, 4, 5),
 	"idle": gather_frames(character, 13, 21, 4, 5, 1),
-	"walk_up": gather_frames(character, 13, 21, 4, 5, 2),
 	"attack": gather_frames(character, 13, 21, 4, 5, 3),
 	"jump": gather_frames(character, 13, 21, 4, 5, 4),
 	"damage": gather_frames(character, 13, 21, 4, 5, 5)
@@ -77,7 +76,6 @@ def get_player_texture(player_spritesheet):
 	return {
 	"walk": gather_frames(player_spritesheet, 13, 21, 3, 5),
 	"idle": gather_frames(player_spritesheet, 13, 21, 3, 5, 1),
-	"walk_up": gather_frames(player_spritesheet, 13, 21, 3, 5, 2),
 	"attack": gather_frames(player_spritesheet, 13, 21, 3, 5, 3),
 	"jump": gather_frames(player_spritesheet, 13, 21, 3, 5, 4),
 	"damage": gather_frames(player_spritesheet, 13, 21, 3, 5, 5)
