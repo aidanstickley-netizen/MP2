@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+import hud_ui as ui
 
 class SpriteSheet():
     def __init__(self, image):
@@ -10,28 +11,24 @@ class SpriteSheet():
         individual_img.blit(self.sheet, (0, 0), ((frame * width), 0, width, height))
         individual_img = pygame.transform.scale(individual_img, (width * s, height * s))
         return individual_img
-def gather_frames(to_be_cut, x_size, y_size, mult, frame_count, row_count = 0, mirroring = False):
-	Animation_object = SpriteSheet(mirror_image(to_be_cut, mirroring))
-	return [Animation_object.get_frame(i, x_size, y_size, mult, row= row_count) for i in range(frame_count)]
-def mirror_image(object, check):
-	if check:
-		object = pygame.transform.flip(object, -1, 0)
-	return object
+
 class player(pygame.sprite.Sprite):
     def __init__(self, frames: dict[str, pygame.Surface], name: str, spawning_location):
         super().__init__()
         self.frames = frames
         self.velocity = pygame.math.Vector2(0, 0)
         self.state = "idle"
-        self.mirror=False
+        self.mirror= False
         self.animation=0.15
         self.image = self.frames[self.state]
         self.name: str = name
         self.hp: int = 8
         self.max_hp: int = 8
+        self.hearts: int = 12
+        self.max_hearts: int = 12
         self.rings: int = 0
         self.money: int = 0
-        self.rect = self.image.get_rect(center=spawning_location)
+        self.rect = self.image.get_rect(center= spawning_location)
         self.inv: list[str]=[]
         self.status_effects: list[dict] = []
         self.equipped_weapon: str | None = "bare fists"
@@ -46,6 +43,7 @@ class player(pygame.sprite.Sprite):
             else:
                 self.on_ground = False
             self.animate()
+
     def animate(self):
         if self.velocity.x < 0:
             self.mirror = True
@@ -118,24 +116,17 @@ weapons_database = {
 pygame.init()
 screen1 = pygame.display.set_mode((800,400))
 gravity = 0.8
-playerimage = pygame.image.load("dde.png").convert_alpha()
-enermyimage = pygame.image.load("eed.png").convert_alpha()
-p1_sheet_cut = SpriteSheet(playerimage)
-p2_sheet_cut = SpriteSheet(enermyimage)
+player1_image = pygame.image.load("graphics/characters/scr_guy_blue.png").convert_alpha()
+player2_image = pygame.image.load("graphics/characters/scr_guy_purple.png").convert_alpha()
 fw=160
 fh=300
 s=0.3
 nf=2
-SpriteSheet
-p1_sheet = {
-    "idle": p1_sheet_cut.get_image(0, fw, fh - 25, s),
-    "jump": p1_sheet_cut.get_image(1, fw, fh - 25, s),
-}
-p2_sheet = {
-    "idle": p2_sheet_cut.get_image(0, fw, fh, s),
-    "jump": p2_sheet_cut.get_image(1, fw, fh, s),
-}
+p1_sheet = ui.get_player_texture(player1_image)
+p2_sheet = ui.get_player_texture(player2_image)
+
 floor_y = 350
+
 class Bullets(pygame.sprite.Sprite):
     def __init__(self, spawning_location, Direction):
         super().__init__()
@@ -149,8 +140,8 @@ class Bullets(pygame.sprite.Sprite):
         if(self.rect.top<0 or self.rect.left<0 or self.rect.right>800 or self.rect.bottom >400):
              self.kill()
 
-player1 = player(p1_sheet,"hfud" ,(100, 200))
-player2 = player(p2_sheet,"wer" ,(300, 200))
+player1 = player(p1_sheet,"hfud" ,(100, 200))#ui.get_player_texture(ui.character)
+player2 = player(p2_sheet,"wer" ,  (300, 200))
 
 sprites_list1 = pygame.sprite.Group()
 sprites_list1.add(player1)

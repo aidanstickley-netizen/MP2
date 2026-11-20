@@ -1,6 +1,7 @@
 import pygame
 import random
 import hud_ui as ui
+import test as mov
 # frame rate is 60/s
 # animation frame rate is 12/s
 particle = 0
@@ -19,8 +20,7 @@ heart_level = 0 #placeholder
 Game_active = True
 animation_tick = 0
 ticking_tool = 0
-global page
-page = "title"
+page = "battle1v1"
 
 	
 while Game_active:
@@ -30,7 +30,7 @@ while Game_active:
 				Game_active = False
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_c:
-				page = "battle1vbot"
+				page = "battle1v1"
 		if event.type == pygame.MOUSEBUTTONDOWN:
 			if event.button == 1 & (100 < event.pos[0] < 200) & (200 < event.pos[1] < 400):
 				page = "battle1vbot"
@@ -39,35 +39,50 @@ while Game_active:
 
 		ui.flet_button(100, 200, 100, 200)
 
-	elif page == "battle1v1":
+	if page == "battle1v1":
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				Game_active = False
 			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_w:
-					if frame_var < 7:
-						frame_var +=1
-					else:
-						frame_var = 0
-				elif event.key == pygame.K_s:
-					if heart_level < 12:
-						heart_level +=1
-					else:
-						heart_level = 0
-					print(heart_level)
-				elif event.key == pygame.K_c:
+				if event.key == pygame.K_w and mov.player1.on_ground:
+					mov.player1.velocity.y = -15
+					mov.player1.on_ground = False
+				if event.key == pygame.K_a:
+					mov.player1.velocity.x -= 2
+				if event.key == pygame.K_d:
+					mov.player1.velocity.x += 2
+				if event.key == pygame.K_UP and mov.player2.on_ground:
+					mov.player2.velocity. y = -15
+					mov.player2.on_ground = False
+				if event.key == pygame.K_LEFT:
+					mov.player2.velocity.x -=2
+				if event.key == pygame.K_RIGHT:
+					mov.player2.velocity.x += 2
+			if event.type == pygame.KEYUP:
+				if event.key == pygame.K_a:
+					mov.player1.velocity.x += 2
+				if event.key == pygame.K_d:
+					mov.player1.velocity.x -= 2
+				if event.key == pygame.K_LEFT:
+					mov.player2.velocity.x += 2
+				if event.key == pygame.K_RIGHT:
+					mov.player2.velocity.x -= 2
+				if event.key == pygame.K_c:
 					page = "battle1vbot"
 
-		Screen1.fill(color2)
+
+		Screen1.fill((100,0,0))
+		pygame.draw.line(Screen1, (200, 200, 200), (0, mov.floor_y), (800, mov.floor_y), 3)
+		mov.player1.update(mov.gravity, mov.floor_y)
+		mov.player2.update(mov.gravity, mov.floor_y)
+		mov.sprites_list1.draw(Screen1)
 
 		ui.make_event_display(42)
 
-		ui.display_num(ticking_tool, 500, 300, 1)
+		ui.make_hud(15, 15, False, mov.player1.hp -1, mov.player1.hearts, mov.player1.rings, mov.player1.money)
+		ui.make_hud(585, 15, True, mov.player2.hp -1, mov.player2.hearts, mov.player2.rings, mov.player2.money)
 
-		ui.make_hud(15, 15, False, frame_var, heart_level, frame_var, heart_level)
-		ui.make_hud(585, 15, True, 5, 7)
-
-	elif page == "battle1vbot":
+	if page == "battle1vbot":
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				Game_active = False

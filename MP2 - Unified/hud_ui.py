@@ -9,25 +9,27 @@ Screen1 = pygame.display.set_mode((800,400))
 color = (100, 100, 255)
 Screen1.fill(color)
 
-scr = pygame.image.load("graphics/scr_rotate.png")
-bar = pygame.image.load("graphics/hud/hit_bar.png")
-hearts = pygame.image.load("graphics/hud/hearts.png")
+scr = pygame.image.load("graphics/scr_rotate.png").convert_alpha()
+bar = pygame.image.load("graphics/hud/hit_bar.png").convert_alpha()
+hearts = pygame.image.load("graphics/hud/hearts.png").convert_alpha()
 
-ui_1 = pygame.image.load("graphics/hud/equipped_item_ui.png")
+ui_1 = pygame.image.load("graphics/hud/equipped_item_ui.png").convert_alpha()
 ui_1 = pygame.transform.scale(ui_1, (66 * 3, 17 * 3))
 
-ui_2 = pygame.image.load("graphics/hud/currency_marker_ui.png")
+ui_2 = pygame.image.load("graphics/hud/currency_marker_ui.png").convert_alpha()
 ui_2 = pygame.transform.scale(ui_2, (9 * 3, 16 * 3))
 
 ui_3 = pygame.image.load("graphics/hud/current_event_ui.png")
 ui_3 = pygame.transform.scale(ui_3, (44 * 3, 30 * 3))
 
-numbers_black = pygame.image.load("graphics/hud/zero_to_nine_num_black.png")
-numbers_white = pygame.image.load("graphics/hud/zero_to_nine_num_white.png")
+numbers_black = pygame.image.load("graphics/hud/zero_to_nine_num_black.png").convert_alpha()
+numbers_white = pygame.image.load("graphics/hud/zero_to_nine_num_white.png").convert_alpha()
 
-character = pygame.image.load("graphics/characters/scr_guy_blue.png")
+character = pygame.image.load("graphics/characters/scr_guy_blue.png").convert_alpha()
+def get_player_spritesheet():
+	print("hello")
 
-equipment = pygame.image.load("graphics/equipment/weapons_icon.png")
+equipment = pygame.image.load("graphics/equipment/weapons_icon.png").convert_alpha()
 
 def gather_frames(to_be_cut, x_size, y_size, mult, frame_count, row_count = 0, mirroring = False):
 	Animation_object = spriteSheet(mirror_image(to_be_cut, mirroring))
@@ -48,9 +50,9 @@ class spriteSheet():
 	def __init__(self, image):
 		self.sheet = image
 	def get_frame(self, frame, width, height, scale, row = 0):
-		individual_img = pygame.Surface((width, height), pygame.SRCALPHA)
+		individual_img = pygame.Surface((width, height), pygame.SRCALPHA).convert_alpha()
 		individual_img.blit(self.sheet, (0, 0), ((frame * width), (row * height), width, height))
-		individual_img = pygame.transform.scale(individual_img, (width * scale, height * scale))
+		individual_img = pygame.transform.scale(individual_img, (width * scale, height * scale)).convert_alpha()
 		return individual_img
 
 Frames = gather_frames(scr, 9, 9, 3, 8)
@@ -63,17 +65,22 @@ number = [gather_frames(numbers_black, 3, 7, 3, 10),
 held_equipment = gather_frames(equipment, 13, 13, 3, 75)
 
 player = {
-	"walk_right": gather_frames(character, 13, 21, 3, 5),
-	"idle_right": gather_frames(character, 13, 21, 3, 5, 1),
-	"walk_right_up": gather_frames(character, 13, 21, 3, 5, 2),
-	"attack_right": gather_frames(character, 13, 21, 3, 5, 3),
-	"jump_right": gather_frames(character, 13, 21, 3, 5, 4),
-	"damage": gather_frames(character, 13, 21, 3, 5, 5),
-	"walk_left": gather_frames(character, 13, 21, 3, 5, mirroring= True),
-	"idle_left": gather_frames(character, 13, 21, 3, 5, 1, mirroring= True),
-	"walk_left_up": gather_frames(character, 13, 21, 3, 5, 2, mirroring= True),
-	"attack_left": gather_frames(character, 13, 21, 3, 5, 3, mirroring= True),
-	"jump_left": gather_frames(character, 13, 21, 3, 5, 4, mirroring= True)
+	"walk": gather_frames(character, 13, 21, 4, 5),
+	"idle": gather_frames(character, 13, 21, 4, 5, 1),
+	"walk_up": gather_frames(character, 13, 21, 4, 5, 2),
+	"attack": gather_frames(character, 13, 21, 4, 5, 3),
+	"jump": gather_frames(character, 13, 21, 4, 5, 4),
+	"damage": gather_frames(character, 13, 21, 4, 5, 5)
+	}
+
+def get_player_texture(player_spritesheet):
+	return {
+	"walk": gather_frames(player_spritesheet, 13, 21, 3, 5),
+	"idle": gather_frames(player_spritesheet, 13, 21, 3, 5, 1),
+	"walk_up": gather_frames(player_spritesheet, 13, 21, 3, 5, 2),
+	"attack": gather_frames(player_spritesheet, 13, 21, 3, 5, 3),
+	"jump": gather_frames(player_spritesheet, 13, 21, 3, 5, 4),
+	"damage": gather_frames(player_spritesheet, 13, 21, 3, 5, 5)
 	}
 
 frame_var = 0 #placeholder
