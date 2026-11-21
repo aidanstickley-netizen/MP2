@@ -159,7 +159,18 @@ class Bullets(pygame.sprite.Sprite):
     def update(self):
         self.rect.move_ip(self.direction)
         if self.rect.top < 0 or self.rect.left < 0 or self.rect.right > 800 or self.rect.bottom > 400:
-            self.kill();
+            self.kill()
+def update_bullets():
+    Bullet_list.update()
+    for bullet in Bullet_list:
+        hit_players = pygame.sprite.spritecollide(bullet, sprites_list1, False)
+        for target in hit_players:
+            if target != bullet.owner:
+                target.take_damage(bullet.damage)
+                bullet.kill()
+                if target.hearts <= 0:
+                    target.kill()
+                break
 player1 = player(p1_sheet,"hfud" ,(100, 200))
 player2 = player(p2_sheet,"wer" ,  (300, 200))
 
@@ -169,7 +180,7 @@ sprites_list1.add(player2)
 
 Bullet_list = pygame.sprite.Group()
 
-gameactive = True
+gameactive = False
 clock = pygame.time.Clock()
 
 while gameactive:
