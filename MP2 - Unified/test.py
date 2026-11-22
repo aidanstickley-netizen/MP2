@@ -93,7 +93,23 @@ class WeponsOptriom:
         self.hit_effect= hit_effect
         self.crit_chance= crit_chance
         self.aoe= aoe
+class DefenceOption:
+    def __init__(self,name,block_amount,cost,currency,cooldown,duration,dodge_chance,is_aoe_shield):
+        self.name = name
+        self.block_amount = block_amount
+        self.cost = cost
+        self.currency = currency
+        self.cooldown = cooldown
+        self.duration = duration
+        self.dodge_chance = dodge_chance 
+        self.is_aoe_shield = is_aoe_shield 
+    def mitigate_damage(self, incoming_damage, is_aoe_attack=False):
+        effective_block = self.block_amount
+        if is_aoe_attack and not self.is_aoe_shield:
+            effective_block *= 0.5
 
+        final_damage = max(0, incoming_damage - effective_block)
+        return final_damage
 effects = {
     1: {"name": "no effect", "damage_per_tick": 0, "duration": 0},
     2: {"name": "bleed", "damage_per_tick": 1, "duration": 2},
@@ -116,6 +132,16 @@ weapons_database = {
     "Kunai Throw": WeponsOptriom("Kunai Throw", 12, 8, "rings",1, 1, 0.10, False),
     "lighting": WeponsOptriom("lighting", 90, 60, "money",18, 6, 0.15, False),
     "fireball": WeponsOptriom("fireball", 50, 35, "money",14, 4, 0.10, True),
+    "arcane missile": WeponsOptriom("Arcane Missile", 18, 12, "money", 2, 1, 0.20, False),
+    "venom cloud": WeponsOptriom("Venom Cloud", 15, 25, "money", 11, 3, 0.05, True),
+    "meteor shower": WeponsOptriom("Meteor Shower", 140, 110, "money", 25, 4, 0.10, True),
+    "blood siphon": WeponsOptriom("Blood Siphon", 35, 40, "money", 10, 2, 0.10, False),
+    "chain lightning": WeponsOptriom("Chain Lightning", 65, 55, "money", 14, 6, 0.15, True),
+    "water jet": WeponsOptriom("Water Jet", 20, 15, "money", 4, 1, 0.10, False),
+    "solar flare": WeponsOptriom("Solar Flare", 80, 70, "money", 16, 4, 0.15, True),
+    "necrotic touch": WeponsOptriom("Necrotic Touch", 42, 32, "money", 8, 5, 0.10, False),
+    "eldritch blast": WeponsOptriom("Eldritch Blast", 55, 45, "money", 7, 1, 0.20, False),
+    "frost nova": WeponsOptriom("Frost Nova", 45, 38, "money", 13, 6, 0.05, True),
     "earth magic": WeponsOptriom("earth magic", 30, 22, "money",12, 1, 0.05, True),
     "wind magic": WeponsOptriom("wind magic", 16, 10, "money",6, 1, 0.10, False),
     "bone spear": WeponsOptriom("Bone Spear", 38, 30, "money",15, 2, 0.15, False),
@@ -148,7 +174,7 @@ p2_sheet = ui.get_player_texture(player2_image)
 floor_y = 350
 
 class Bullets(pygame.sprite.Sprite):
-    def __init__(self, spawning_location, direction, owner, damage=7):
+    def __init__(self, spawning_location, direction, owner, damage=3):
         super().__init__()
         self.image = pygame.Surface([10, 10])
         self.image.fill((227, 174, 27))
