@@ -9,9 +9,9 @@ Screen1 = pygame.display.set_mode((800,400))
 color = (100, 100, 255)
 Screen1.fill(color)
 
-scr = pygame.image.load("graphics/scr_rotate.png").convert_alpha()
-bar = pygame.image.load("graphics/hud/hit_bar.png").convert_alpha()
-hearts = pygame.image.load("graphics/hud/hearts.png").convert_alpha()
+scr_sprite_sheet = pygame.image.load("graphics/scr_rotate.png").convert_alpha()
+bar_sprite_sheet = pygame.image.load("graphics/hud/hit_bar.png").convert_alpha()
+hearts_sprite_sheet = pygame.image.load("graphics/hud/hearts.png").convert_alpha()
 
 ui_1 = pygame.image.load("graphics/hud/equipped_item_ui.png").convert_alpha()
 ui_1 = pygame.transform.scale(ui_1, (66 * 3, 17 * 3))
@@ -30,6 +30,8 @@ def get_player_spritesheet():
 	print("hello")
 
 equipment = pygame.image.load("graphics/equipment/weapons_icon.png").convert_alpha()
+
+four_buttons = pygame.image.load("graphics/user_interface/four_buttons.png").convert_alpha()
 
 def gather_frames(to_be_cut, x_size, y_size, mult, frame_count, row_count = 0, mirroring = False):
 	Animation_object = spriteSheet(mirror_image(to_be_cut, mirroring))
@@ -55,14 +57,17 @@ class spriteSheet():
 		individual_img = pygame.transform.scale(individual_img, (width * scale, height * scale)).convert_alpha()
 		return individual_img
 
-Frames = gather_frames(scr, 9, 9, 3, 8)
-Frames_bar = gather_frames(bar, 49, 7, 3, 8)
-Frames_heart = gather_frames(hearts, 9, 9, 3, 5)
+scr_single = gather_frames(scr_sprite_sheet, 9, 9, 3, 8)
+damage_bar = gather_frames(bar_sprite_sheet, 49, 7, 3, 8)
+Frames_heart = gather_frames(hearts_sprite_sheet, 9, 9, 3, 5)
+
+indiviual_button = gather_frames(four_buttons, 20, 20, 3, 4)
 
 number = [gather_frames(numbers_black, 3, 7, 3, 10), 
           gather_frames(numbers_white, 3, 7, 3, 10)]
 	
 held_equipment = gather_frames(equipment, 13, 13, 3, 75)
+held_equipment = gather_frames(pygame.image.load("graphics/equipment/weapons_scrw_v2.png"), 13, 13, 3, 10) # temp
 
 player = {
 	"walk": gather_frames(character, 13, 21, 4, 5),
@@ -88,8 +93,8 @@ Game_active = False # set to true to ativate this code
 animation_tick = 0
 ticking_tool = 0
 
-def flet_button(xcord, ycord, xsize, ysize):
-	button_blit_tool = pygame.image.load("graphics/characters/scr_guy_purple.png")
+def flet_button(xcord, ycord, xsize, ysize, value: int = 0):
+	button_blit_tool = indiviual_button[value]
 	button_blit_tool = pygame.transform.scale(button_blit_tool, (xsize, ysize))
 	Screen1.blit(button_blit_tool, (xcord, ycord))
 
@@ -104,7 +109,7 @@ def display_wallet(xcord, ycord, scr_count = 0, money_count = 0, money_display_m
 	display_num(scr_count, xcord, ycord)
 	display_num(money_count, xcord, ycord + 27)
 
-def make_hud(x_cord, y_cord, mirror, bar, heart, scr_value = 100, money_value = 30):
+def make_hud(x_cord, y_cord, mirror, bar, heart, scr_value = 100, money_value = 30, equip_slot_1 = 0, equip_slot_2 = 1, equip_slot_3 = 2):
 	bar_add_x = x_cord + 12
 	number_x_offset = x_cord + 42
 	mirror_buff = [0, 30, 60]
@@ -131,16 +136,16 @@ def make_hud(x_cord, y_cord, mirror, bar, heart, scr_value = 100, money_value = 
 		hearts[0] = heart
 
 	Screen1.blit(mirror_image(ui_1, mirror), (x_cord, y_cord))
-	Screen1.blit(mirror_image(Frames_bar[bar], mirror), (bar_add_x, y_cord + 54))
+	Screen1.blit(mirror_image(damage_bar[bar], mirror), (bar_add_x, y_cord + 54))
 
 	display_wallet(number_x_offset, y_cord + 114, scr_value, money_value, money_display_move = money_display)
 
 	for x in range(3):
 		Screen1.blit(mirror_image(Frames_heart[hearts[x]], mirror), (bar_add_x + mirror_buff[x], y_cord + 78))
 
-	Screen1.blit(mirror_image(held_equipment[4], mirror), (x_cord + held_equipment_mirror[0], y_cord + 6))
-	Screen1.blit(mirror_image(held_equipment[5], mirror), (x_cord + held_equipment_mirror[1], y_cord + 6))
-	Screen1.blit(mirror_image(held_equipment[6], mirror), (x_cord + held_equipment_mirror[2], y_cord + 6))
+	Screen1.blit(mirror_image(held_equipment[equip_slot_1], mirror), (x_cord + held_equipment_mirror[0], y_cord + 6))
+	Screen1.blit(mirror_image(held_equipment[equip_slot_2], mirror), (x_cord + held_equipment_mirror[1], y_cord + 6))
+	Screen1.blit(mirror_image(held_equipment[equip_slot_3], mirror), (x_cord + held_equipment_mirror[2], y_cord + 6))
 
 def make_event_display(time, xpos = 333, ypos = 9):
 	Screen1.blit(ui_3, (xpos, ypos))
@@ -168,7 +173,7 @@ while Game_active:
 
 	Screen1.fill(color)
 
-	Screen1.blit(Frames[animation_tick % 8], (200,200))
+	Screen1.blit(scr_single[animation_tick % 8], (200,200))
 
 	make_event_display(42)
 

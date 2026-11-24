@@ -15,15 +15,14 @@ Screen1.fill(color)
 color2 = (100, 200, 255)
 color3 = (200, 200, 255)
 
-frame_var = 0 #placeholder
-heart_level = 0 #placeholder
 Game_active = True
 animation_tick = 0
 ticking_tool = 0
-page = "battle1v1"
+page = "title"
+buttons = []
 
-	
 while Game_active:
+	buttons = [[100, 300, 180, 60, "battle1v1", 0], [300, 300, 180, 60, "battlevbot", 1], [500, 300, 180, 60, "settings", 2]]
 	if page == "title":
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -32,14 +31,19 @@ while Game_active:
 			if event.key == pygame.K_c:
 				page = "battle1v1"
 		if event.type == pygame.MOUSEBUTTONDOWN:
-			if event.button == 1 & (100 < event.pos[0] < 200) & (200 < event.pos[1] < 400):
-				page = "battle1vbot"
+			if event.button == 1:
+				for x in range(len(buttons)):
+					if (buttons[x][0] < event.pos[0] < buttons[x][0] + buttons[x][2]) and (buttons[x][1] < event.pos[1] < buttons[x][1] + buttons[x][3]):
+						page = buttons[x][4]
+					if (event.pos[0] < 10) and (event.pos[1] < 10):
+						print("egg")
 
 		Screen1.fill(color)
-
-		ui.flet_button(100, 200, 100, 200)
+		for x in range(len(buttons)):
+			ui.flet_button(buttons[x][0], buttons[x][1], buttons[x][2], buttons[x][3], buttons[x][5])
 
 	if page == "battle1v1":
+		buttons = [[740, 340, 60, 60, "title", 2]]
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				Game_active = False
@@ -67,13 +71,18 @@ while Game_active:
 					mov.player2.velocity.x += 2
 				if event.key == pygame.K_RIGHT:
 					mov.player2.velocity.x -= 2
+
 				if event.key == pygame.K_c:
-					page = "battle1vbot"
+					page = "battlevbot"
 			if event.type == pygame.MOUSEBUTTONDOWN:
 				if event.button == 1 and mov.player1.alive():
 					mov.player1.fire(event.pos)
 				if event.button == 3 and mov.player2.alive():
 					mov.player2.fire(event.pos)
+				if event.button == 1:
+					for x in range(len(buttons)):
+						if (buttons[x][0] < event.pos[0] < buttons[x][0] + buttons[x][2]) and (buttons[x][1] < event.pos[1] < buttons[x][1] + buttons[x][3]):
+							page = buttons[x][4]
 
 
 		Screen1.fill((100,0,0))
@@ -89,24 +98,25 @@ while Game_active:
 		ui.make_hud(15, 15, False, mov.player1.hp -1, mov.player1.hearts, mov.player1.rings, mov.player1.money)
 		ui.make_hud(585, 15, True, mov.player2.hp -1, mov.player2.hearts, mov.player2.rings, mov.player2.money)
 
-	if page == "battle1vbot":
+		for x in range(len(buttons)):
+			ui.flet_button(buttons[x][0], buttons[x][1], buttons[x][2], buttons[x][3], buttons[x][5])
+
+	if page == "battlevbot":
+		buttons = [[740, 340, 60, 60, "title", 2]]
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				Game_active = False
 			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_w:
-					if frame_var < 7:
-						frame_var +=1
-					else:
-						frame_var = 0
-				elif event.key == pygame.K_s:
-					if heart_level < 12:
-						heart_level +=1
-					else:
-						heart_level = 0
-					print(heart_level)
-				elif event.key == pygame.K_c:
+				if event.key == pygame.K_c:
 					page = "title"
+				elif event.key == pygame.K_v:
+					page = "battle1v1"
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				if event.button == 1:
+					for x in range(len(buttons)):
+						if (buttons[x][0] < event.pos[0] < buttons[x][0] + buttons[x][2]) and (buttons[x][1] < event.pos[1] < buttons[x][1] + buttons[x][3]):
+							page = buttons[x][4]
+
 
 		Screen1.fill(color3)
 
@@ -114,7 +124,25 @@ while Game_active:
 
 		ui.display_num(ticking_tool, 500, 300, 1)
 
-		ui.make_hud(15, 15, False, frame_var, heart_level, frame_var, heart_level)
+		ui.make_hud(15, 15, False, 1, 2, 3, 4)
+
+		for x in range(len(buttons)):
+			ui.flet_button(buttons[x][0], buttons[x][1], buttons[x][2], buttons[x][3], buttons[x][5])
+
+	if page == "settings":
+		buttons = [[100, 200, 100, 200, "title", 0]]
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				Game_active = False
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			if event.button == 1:
+				for x in range(len(buttons)):
+					if (buttons[x][0] < event.pos[0] < buttons[x][0] + buttons[x][2]) and (buttons[x][1] < event.pos[1] < buttons[x][1] + buttons[x][3]):
+						page = buttons[x][4]
+
+		Screen1.fill(color)
+		for x in range(len(buttons)):
+			ui.flet_button(buttons[x][0], buttons[x][1], buttons[x][2], buttons[x][3], buttons[x][5])
 	
 	pygame.display.update()
 	pygame.Clock().tick(60)
