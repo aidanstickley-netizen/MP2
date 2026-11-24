@@ -11,7 +11,7 @@ class SpriteSheet():
         individual_img.blit(self.sheet, (0, 0), ((frame * width), 0, width, height))
         individual_img = pygame.transform.scale(individual_img, (width * s, height * s))
         return individual_img
-
+ 
 class player(pygame.sprite.Sprite):
     def __init__(self, frames: dict[str, pygame.Surface], name: str, spawning_location):
         super().__init__()
@@ -93,23 +93,42 @@ class WeponsOptriom:
         self.hit_effect= hit_effect
         self.crit_chance= crit_chance
         self.aoe= aoe
-class DefenceOption:
-    def __init__(self,name,block_amount,cost,currency,cooldown,duration,dodge_chance,is_aoe_shield):
-        self.name = name
-        self.block_amount = block_amount
-        self.cost = cost
-        self.currency = currency
-        self.cooldown = cooldown
-        self.duration = duration
-        self.dodge_chance = dodge_chance 
-        self.is_aoe_shield = is_aoe_shield 
-    def mitigate_damage(self, incoming_damage, is_aoe_attack=False):
-        effective_block = self.block_amount
-        if is_aoe_attack and not self.is_aoe_shield:
-            effective_block *= 0.5
-
-        final_damage = max(0, incoming_damage - effective_block)
-        return final_damage
+def rogueEvents(player1,player2):
+    rogue=random.randint(1,17)
+    if rogue == 1:
+        print("ACID RAIN")
+    elif rogue == 2:
+        print("WORKOUT MADNESS")
+    elif rogue == 3:
+        print("ＦＲＥＡＫＹ ＦＲＩＤＡＹ")
+    elif rogue == 4:
+        print(" ")
+    elif rogue == 5:
+        print(" ")
+    elif rogue == 5:
+        print(" ")
+    elif rogue == 6:
+        print(" ")
+    elif rogue == 7:
+        print(" ")
+    elif rogue == 8:
+        print(" ")
+    elif rogue == 9:
+        print(" ")
+    elif rogue == 10:
+        print(" ")
+    elif rogue == 11:
+        print(" ")
+    elif rogue == 12:
+        print(" ")
+    elif rogue == 13:
+        print(" ")
+    elif rogue == 14:
+        print(" ")
+    elif rogue == 15:
+        print(" ")
+    elif rogue == 16:
+        print(" ")
 effects = {
     1: {"name": "no effect", "damage_per_tick": 0, "duration": 0},
     2: {"name": "bleed", "damage_per_tick": 1, "duration": 2},
@@ -205,8 +224,8 @@ sprites_list1.add(player1)
 sprites_list1.add(player2)
 
 Bullet_list = pygame.sprite.Group()
-
-gameactive = False
+time=0
+gameactive = True
 clock = pygame.time.Clock()
 
 while gameactive:
@@ -242,6 +261,7 @@ while gameactive:
                 player1.fire(event.pos)
             if event.button == 3:
                 player2.fire(event.pos)
+        print()
     screen1.fill((0,0,0))
     pygame.draw.line(screen1, (200, 200, 200), (0, floor_y), (800, floor_y), 3)
     player1.update(gravity, floor_y)
@@ -258,6 +278,9 @@ while gameactive:
                 break
     sprites_list1.draw(screen1)
     Bullet_list.draw(screen1)
-    
+    time+=1
+    print(time)
+    if time % 1800 == 0:
+        rogueEvents(player1,player2)
     pygame.display.update()
     clock.tick(60)
