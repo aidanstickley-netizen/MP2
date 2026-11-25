@@ -21,14 +21,15 @@ class player(pygame.sprite.Sprite):
         self.state = "idle"
         self.mirror= False
         self.animation=0.15
+        self.damageMultiplyer=1
         self.image = self.frames[self.state][0]
         self.name: str = name
         self.hp: int = 8
         self.max_hp: int = 8
         self.hearts: int = 12
         self.max_hearts: int = 12
-        self.rings: int = 0
-        self.money: int = 0
+        self.rings: int = 10
+        self.money: int = 10
         self.rect = self.image.get_rect(center= spawning_location)
         self.inv: list[str]=[]
         self.status_effects: list[dict] = []
@@ -97,38 +98,41 @@ def rogueEvents(player1,player2):
     rogue=random.randint(1,17)
     if rogue == 1:
         print("ACID RAIN")
+        player1.hp-=5
+        player2.hp-=5
     elif rogue == 2:
         print("WORKOUT MADNESS")
+
     elif rogue == 3:
-        print("ＦＲＥＡＫＹ ＦＲＩＤＡＹ")
+        print("FREAKY FRIDAY")
     elif rogue == 4:
-        print(" ")
+        print("TAX EVATION AUDIT")
     elif rogue == 5:
-        print(" ")
+        print("ROBIN HOOD'S GREED")
     elif rogue == 5:
-        print(" ")
+        print("CRYPTO BOOM")
     elif rogue == 6:
-        print(" ")
+        print("GREAT DIPRESSION PT 2")
     elif rogue == 7:
-        print(" ")
+        print("MYSTERY MEAT")
     elif rogue == 8:
-        print(" ")
+        print("CRYPTO RUGPULL")
     elif rogue == 9:
-        print(" ")
+        print("COMMMUNISUM")
     elif rogue == 10:
-        print(" ")
+        print("BODY SWAP")
     elif rogue == 11:
-        print(" ")
+        print("RUSSIAN ROULETTE")
     elif rogue == 12:
-        print(" ")
+        print("GAMBLING ADDICTION")
     elif rogue == 13:
-        print(" ")
+        print("STAT SHUFFLE")
     elif rogue == 14:
-        print(" ")
+        print("BLOOD MONEY")
     elif rogue == 15:
-        print(" ")
+        print("MYSTERY BOX")
     elif rogue == 16:
-        print(" ")
+        print("STOCK SPIKE")
 effects = {
     1: {"name": "no effect", "damage_per_tick": 0, "duration": 0},
     2: {"name": "bleed", "damage_per_tick": 1, "duration": 2},
@@ -224,8 +228,9 @@ sprites_list1.add(player1)
 sprites_list1.add(player2)
 
 Bullet_list = pygame.sprite.Group()
+s_time_round=0
 time=0
-gameactive = True
+gameactive = False
 clock = pygame.time.Clock()
 
 while gameactive:
@@ -279,8 +284,11 @@ while gameactive:
     sprites_list1.draw(screen1)
     Bullet_list.draw(screen1)
     time+=1
-    print(time)
-    if time % 1800 == 0:
+    if time%60==0:
+        s_time_round+=1
+        print(s_time_round)
+    if s_time_round == 30:
         rogueEvents(player1,player2)
+        s_time_round=0
     pygame.display.update()
     clock.tick(60)
