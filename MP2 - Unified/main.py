@@ -19,31 +19,33 @@ Game_active = True
 animation_tick = 0
 ticking_tool = 0
 page = "title"
+current_match = ""
 buttons = []
 
 while Game_active:
-	buttons = [[100, 300, 180, 60, "battle1v1", 0], [300, 300, 180, 60, "battlevbot", 1], [500, 300, 180, 60, "settings", 2]]
 	if page == "title":
+		buttons = [ui.button_maker(x_cord= 100, y_cord= 300, x_size= 180, y_size= 60, texture= 0, set_page_to= "battle1v1"),
+	 		ui.button_maker(x_cord= 300, y_cord= 300, x_size= 180, y_size= 60, texture= 1, set_page_to= "battlevbot"),
+	 		ui.button_maker(x_cord= 500, y_cord= 300, x_size= 180, y_size= 60, texture= 2, set_page_to= "settings")]
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				Game_active = False
-		if event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_c:
-				page = "battle1v1"
 		if event.type == pygame.MOUSEBUTTONDOWN:
 			if event.button == 1:
 				for x in range(len(buttons)):
-					if (buttons[x][0] < event.pos[0] < buttons[x][0] + buttons[x][2]) and (buttons[x][1] < event.pos[1] < buttons[x][1] + buttons[x][3]):
-						page = buttons[x][4]
+					if (buttons[x].x_cord < event.pos[0] < buttons[x].x_cord_max) and (buttons[x].y_cord < event.pos[1] < buttons[x].y_cord_max):
+						page = buttons[x].page_output
 					if (event.pos[0] < 10) and (event.pos[1] < 10):
 						print("egg")
+				#ui.new_event_popup(0, 0, active= True) fix
 
 		Screen1.fill(color)
 		for x in range(len(buttons)):
-			ui.flet_button(buttons[x][0], buttons[x][1], buttons[x][2], buttons[x][3], buttons[x][5])
+			ui.flet_button(buttons[x].x_cord, buttons[x].y_cord, buttons[x].x_size, buttons[x].y_size, buttons[x].texture_no)
 
 	if page == "battle1v1":
-		buttons = [[740, 340, 60, 60, "title", 2]]
+		current_match = "1v1"
+		buttons = [ui.button_maker(x_cord= 740, y_cord= 340, texture= 2, set_page_to= "pause")]
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				Game_active = False
@@ -71,9 +73,6 @@ while Game_active:
 					mov.player2.velocity.x += 2
 				if event.key == pygame.K_RIGHT:
 					mov.player2.velocity.x -= 2
-
-				if event.key == pygame.K_c:
-					page = "battlevbot"
 			if event.type == pygame.MOUSEBUTTONDOWN:
 				if event.button == 1 and mov.player1.alive():
 					mov.player1.fire(event.pos)
@@ -81,8 +80,8 @@ while Game_active:
 					mov.player2.fire(event.pos)
 				if event.button == 1:
 					for x in range(len(buttons)):
-						if (buttons[x][0] < event.pos[0] < buttons[x][0] + buttons[x][2]) and (buttons[x][1] < event.pos[1] < buttons[x][1] + buttons[x][3]):
-							page = buttons[x][4]
+						if (buttons[x].x_cord < event.pos[0] < buttons[x].x_cord_max) and (buttons[x].y_cord < event.pos[1] < buttons[x].y_cord_max):
+							page = buttons[x].page_output
 
 
 		Screen1.fill((100,0,0))
@@ -99,23 +98,19 @@ while Game_active:
 		ui.make_hud(585, 15, True, mov.player2.hp -1, mov.player2.hearts, mov.player2.rings, mov.player2.money)
 
 		for x in range(len(buttons)):
-			ui.flet_button(buttons[x][0], buttons[x][1], buttons[x][2], buttons[x][3], buttons[x][5])
+			ui.flet_button(buttons[x].x_cord, buttons[x].y_cord, buttons[x].x_size, buttons[x].y_size, buttons[x].texture_no)
 
 	if page == "battlevbot":
-		buttons = [[740, 340, 60, 60, "title", 2]]
+		current_match = "vbot"
+		buttons = [ui.button_maker(x_cord= 740, y_cord= 340, texture= 2, set_page_to= "pause")]
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				Game_active = False
-			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_c:
-					page = "title"
-				elif event.key == pygame.K_v:
-					page = "battle1v1"
 			if event.type == pygame.MOUSEBUTTONDOWN:
 				if event.button == 1:
 					for x in range(len(buttons)):
-						if (buttons[x][0] < event.pos[0] < buttons[x][0] + buttons[x][2]) and (buttons[x][1] < event.pos[1] < buttons[x][1] + buttons[x][3]):
-							page = buttons[x][4]
+						if (buttons[x].x_cord < event.pos[0] < buttons[x].x_cord_max) and (buttons[x].y_cord < event.pos[1] < buttons[x].y_cord_max):
+							page = buttons[x].page_output
 
 
 		Screen1.fill(color3)
@@ -127,25 +122,43 @@ while Game_active:
 		ui.make_hud(15, 15, False, 1, 2, 3, 4)
 
 		for x in range(len(buttons)):
-			ui.flet_button(buttons[x][0], buttons[x][1], buttons[x][2], buttons[x][3], buttons[x][5])
+			ui.flet_button(buttons[x].x_cord, buttons[x].y_cord, buttons[x].x_size, buttons[x].y_size, buttons[x].texture_no)
 
 	if page == "settings":
-		buttons = [[100, 200, 100, 200, "title", 0]]
+		buttons = [ui.button_maker(x_cord= 100, y_cord= 200, x_size= 100, y_size= 100, texture= 0, set_page_to= "title")]
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				Game_active = False
 		if event.type == pygame.MOUSEBUTTONDOWN:
 			if event.button == 1:
 				for x in range(len(buttons)):
-					if (buttons[x][0] < event.pos[0] < buttons[x][0] + buttons[x][2]) and (buttons[x][1] < event.pos[1] < buttons[x][1] + buttons[x][3]):
-						page = buttons[x][4]
+					if (buttons[x].x_cord < event.pos[0] < buttons[x].x_cord_max) and (buttons[x].y_cord < event.pos[1] < buttons[x].y_cord_max):
+						page = buttons[x].page_output
+						
+		Screen1.fill(color3)
 
-		Screen1.fill(color)
 		for x in range(len(buttons)):
-			ui.flet_button(buttons[x][0], buttons[x][1], buttons[x][2], buttons[x][3], buttons[x][5])
+			ui.flet_button(buttons[x].x_cord, buttons[x].y_cord, buttons[x].x_size, buttons[x].y_size, buttons[x].texture_no)
+
+	if page == "pause":
+		buttons = [ui.button_maker(x_cord= 100, y_cord= 200, x_size= 100, y_size= 100, texture= 0, set_page_to= "battle"+ current_match),
+		           ui.button_maker(x_cord= 200, y_cord= 200, x_size= 100, y_size= 100, texture= 1, set_page_to= "title")]
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				Game_active = False
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			if event.button == 1:
+				for x in range(len(buttons)):
+					if (buttons[x].x_cord < event.pos[0] < buttons[x].x_cord_max) and (buttons[x].y_cord < event.pos[1] < buttons[x].y_cord_max):
+						page = buttons[x].page_output
+						
+
+		for x in range(len(buttons)):
+			ui.flet_button(buttons[x].x_cord, buttons[x].y_cord, buttons[x].x_size, buttons[x].y_size, buttons[x].texture_no)
 	
 	pygame.display.update()
 	pygame.Clock().tick(60)
 	ticking_tool += 1
 	if ticking_tool % 5 == 0:
 		animation_tick += 1
+	#ui.tick_event_popup() fix

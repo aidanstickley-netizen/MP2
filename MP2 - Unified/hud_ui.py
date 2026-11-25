@@ -57,6 +57,23 @@ class spriteSheet():
 		individual_img = pygame.transform.scale(individual_img, (width * scale, height * scale)).convert_alpha()
 		return individual_img
 
+class button_maker():
+	def __init__(self, x_cord: int, y_cord: int, x_size: int = 60, y_size: int = 60, texture: int = 0, set_page_to: str = ""):
+		self.x_cord = x_cord
+		self.y_cord = y_cord
+		self.x_cord_max = x_cord + x_size
+		self.y_cord_max = y_cord + y_size
+		self.x_size = x_size
+		self.y_size = y_size
+		self.page_output = set_page_to
+		self.texture_no = texture
+
+class event_popup_maker():
+	def __init__(self, x_cord, y_cord, texture, lifetime):
+		self.lifeti = x_cord
+		self.y_cord = y_cord
+		self.texture = texture
+		self.lifetime = lifetime
 scr_single = gather_frames(scr_sprite_sheet, 9, 9, 3, 8)
 damage_bar = gather_frames(bar_sprite_sheet, 49, 7, 3, 8)
 Frames_heart = gather_frames(hearts_sprite_sheet, 9, 9, 3, 5)
@@ -85,6 +102,15 @@ def get_player_texture(player_spritesheet):
 	"jump": gather_frames(player_spritesheet, 13, 21, 3, 5, 4),
 	"damage": gather_frames(player_spritesheet, 13, 21, 3, 5, 5)
 	}
+def get_player_texture2(player_spritesheet_id: str):
+	player_spritesheet = pygame.image.load("graphics/equipment/scr_guy"+ player_spritesheet_id +".png")
+	return {
+	"walk": gather_frames(player_spritesheet, 13, 21, 3, 5),
+	"idle": gather_frames(player_spritesheet, 13, 21, 3, 5, 1),
+	"attack": gather_frames(player_spritesheet, 13, 21, 3, 5, 3),
+	"jump": gather_frames(player_spritesheet, 13, 21, 3, 5, 4),
+	"damage": gather_frames(player_spritesheet, 13, 21, 3, 5, 5)
+	}
 
 frame_var = 0 #placeholder
 heart_level = 0 #placeholder
@@ -92,6 +118,7 @@ Game_active = False # set to true to ativate this code
 
 animation_tick = 0
 ticking_tool = 0
+event_popup_storage = [0, 0, 0, 0, False]
 
 def flet_button(xcord, ycord, xsize, ysize, value: int = 0):
 	button_blit_tool = indiviual_button[value]
@@ -151,9 +178,23 @@ def make_event_display(time, xpos = 333, ypos = 9):
 	Screen1.blit(ui_3, (xpos, ypos))
 	display_num(time, xpos + 45 + 12 - 2, ypos + 66)
 
-def printer():
-	print("hello")
-	
+def new_event_popup(x_cord: int, y_cord: int, texture: int = 0, lifetime: int = 100, active = True):
+	global event_popup_storage
+	event_popup_storage = [x_cord, y_cord, texture, lifetime, active]
+
+def tick_event_popup():
+	global event_popup_storage
+	print(len(event_popup_storage))
+	event_popup_storage[0] += 1
+	event_popup_storage[3] -= 1
+	print(event_popup_storage[3])
+	if event_popup_storage[3] <= 0:
+		event_popup_storage = []
+		print(len(event_popup_storage))
+		print("size reduced")
+	if event_popup_storage[4]:
+		Screen1.blit(indiviual_button[event_popup_storage[2]], (event_popup_storage[0], event_popup_storage[1]))
+
 while Game_active:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
