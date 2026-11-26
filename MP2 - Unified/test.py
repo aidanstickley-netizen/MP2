@@ -21,7 +21,6 @@ class player(pygame.sprite.Sprite):
         self.state = "idle"
         self.mirror= False
         self.animation=0.15
-        self.damageMultiplyer=1
         self.image = self.frames[self.state][0]
         self.name: str = name
         self.hp: int = 8
@@ -94,45 +93,96 @@ class WeponsOptriom:
         self.hit_effect= hit_effect
         self.crit_chance= crit_chance
         self.aoe= aoe
+timexm=1
 def rogueEvents(player1,player2):
-    rogue=random.randint(1,17)
+    global timexm
+    rogue=random.randint(1,15)
     if rogue == 1:
         print("ACID RAIN")
         player1.hp-=5
         player2.hp-=5
     elif rogue == 2:
-        print("WORKOUT MADNESS")
-
+        print("DAY OFF")
+        timexm=2
     elif rogue == 3:
         print("FREAKY FRIDAY")
+        temp = player1.hp
+        player1.hp=player2.hp
+        player2=temp
     elif rogue == 4:
         print("TAX EVATION AUDIT")
-    elif rogue == 5:
-        print("ROBIN HOOD'S GREED")
+        player1.rings/=2
+        player1.money/=2
+        player2.rings/=2
+        player2.money/=2
     elif rogue == 5:
         print("CRYPTO BOOM")
+        player1.rings+=20
+        player2.rings+=20
     elif rogue == 6:
-        print("GREAT DIPRESSION PT 2")
+        print("GREAT DIPRESSION PT 3")
+        player1.money-=20
+        player2.money-=20
     elif rogue == 7:
         print("MYSTERY MEAT")
+        lol=random.randint(1,3)
+        if lol==1:
+            player1.hp+=15
+            player2.hp-=15
+        else:
+            player1.hp-=15
+            player2.hp+=15
     elif rogue == 8:
         print("CRYPTO RUGPULL")
+        player1.rings-=20
+        player2.rings-=20
     elif rogue == 9:
         print("COMMMUNISUM")
     elif rogue == 10:
-        print("BODY SWAP")
-    elif rogue == 11:
         print("RUSSIAN ROULETTE")
-    elif rogue == 12:
+        lol=random.randint(1,7)
+        if lol==1:
+            player2.hp-=50
+        elif lol == 2:
+            player1.hp-=50
+    elif rogue == 11:
         print("GAMBLING ADDICTION")
-    elif rogue == 13:
-        print("STAT SHUFFLE")
-    elif rogue == 14:
+        lol=random.randint(1,3)
+        if lol==1:
+            player1.rings*=2
+            player1.money*=2
+            player2.rings*=2
+            player2.money*=2
+        else:
+            player1.rings=0
+            player1.money=0
+            player2.rings=0
+            player2.money=0
+    elif rogue == 12:
         print("BLOOD MONEY")
-    elif rogue == 15:
+        player1.money=10
+        player2.money=10
+        player1.hp-=15
+        player2.hp-=15
+    elif rogue == 13:
         print("MYSTERY BOX")
-    elif rogue == 16:
+        lol=random.randint(1,101)
+        if lol == 1 or lol == 100:
+            player1.hp=player1.max_hp
+            player1.hearts=player1.max_hearts
+            player1.rings+=500
+            player1.money+=500
+            player2.hp=player2.max_hp
+            player2.hearts=player2.max_hearts
+            player2.rings+=500
+            player2.money+=500
+        else:
+            player1.hp+=1
+            player2.hp+=1
+    elif rogue == 14:
         print("STOCK SPIKE")
+        player1.money+=20
+        player1.money+=20
 effects = {
     1: {"name": "no effect", "damage_per_tick": 0, "duration": 0},
     2: {"name": "bleed", "damage_per_tick": 1, "duration": 2},
@@ -230,7 +280,7 @@ sprites_list1.add(player2)
 Bullet_list = pygame.sprite.Group()
 s_time_round=0
 time=0
-gameactive = False
+gameactive = True
 clock = pygame.time.Clock()
 
 while gameactive:
@@ -266,7 +316,6 @@ while gameactive:
                 player1.fire(event.pos)
             if event.button == 3:
                 player2.fire(event.pos)
-        print()
     screen1.fill((0,0,0))
     pygame.draw.line(screen1, (200, 200, 200), (0, floor_y), (800, floor_y), 3)
     player1.update(gravity, floor_y)
@@ -287,7 +336,7 @@ while gameactive:
     if time%60==0:
         s_time_round+=1
         print(s_time_round)
-    if s_time_round == 30:
+    if s_time_round == 30*timexm:
         rogueEvents(player1,player2)
         s_time_round=0
     pygame.display.update()
