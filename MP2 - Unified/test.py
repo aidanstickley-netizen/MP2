@@ -93,6 +93,24 @@ class WeponsOptriom:
         self.hit_effect= hit_effect
         self.crit_chance= crit_chance
         self.aoe= aoe
+class DefenceOption:
+    def __init__(self,name,block_amount,cost,currency,cooldown,duration,dodge_chance,is_aoe_shield):
+        self.name = name
+        self.block_amount = block_amount
+        self.cost = cost
+        self.currency = currency
+        self.cooldown = cooldown
+        self.duration = duration
+        self.dodge_chance = dodge_chance
+        self.is_aoe_shield = is_aoe_shield
+    def mitigate_damage(self, incoming_damage, is_aoe_attack=False):
+        effective_block = self.block_amount
+        if is_aoe_attack and not self.is_aoe_shield:
+            effective_block *= 0.5
+
+
+        final_damage = max(0, incoming_damage - effective_block)
+        return final_damage
 timexm=1
 def rogueEvents(player1,player2):
     global timexm
